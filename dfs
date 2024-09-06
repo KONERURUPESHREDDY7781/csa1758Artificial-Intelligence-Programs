@@ -1,0 +1,44 @@
+def dfs_recursive(graph, node, visited=None):
+    if visited is None:
+        visited = set()
+    
+    visited.add(node)
+    print(node, end=' ')
+    
+    for neighbor in graph.get(node, []):
+        if neighbor not in visited:
+            dfs_recursive(graph, neighbor, visited)
+
+def dfs_iterative(graph, start):
+    visited = set()
+    stack = [start]
+    
+    while stack:
+        node = stack.pop()
+        
+        if node not in visited:
+            visited.add(node)
+            print(node, end=' ')
+            
+            # Add neighbors to stack (reverse order to ensure correct traversal)
+            stack.extend(reversed(graph.get(node, [])))
+
+# Example usage
+if __name__ == "__main__":
+    # Define the graph as an adjacency list
+    graph = {
+        'A': ['B', 'C'],
+        'B': ['A', 'D', 'E'],
+        'C': ['A', 'F'],
+        'D': ['B'],
+        'E': ['B', 'F'],
+        'F': ['C', 'E']
+    }
+    
+    start_node = 'A'
+    
+    print("DFS (Recursive) Traversal:")
+    dfs_recursive(graph, start_node)
+    
+    print("\nDFS (Iterative) Traversal:")
+    dfs_iterative(graph, start_node)
