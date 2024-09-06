@@ -1,0 +1,41 @@
+import itertools
+import math
+
+def calculate_distance(city1, city2):
+    return math.sqrt((city1[0] - city2[0]) ** 2 + (city1[1] - city2[1]) ** 2)
+
+def total_distance(route, cities):
+    distance = 0
+    for i in range(len(route) - 1):
+        distance += calculate_distance(cities[route[i]], cities[route[i + 1]])
+    distance += calculate_distance(cities[route[-1]], cities[route[0]])  # Return to the starting city
+    return distance
+
+def tsp_bruteforce(cities):
+    num_cities = len(cities)
+    min_route = None
+    min_distance = float('inf')
+    
+    for route in itertools.permutations(range(num_cities)):
+        current_distance = total_distance(route, cities)
+        if current_distance < min_distance:
+            min_distance = current_distance
+            min_route = route
+    
+    return min_route, min_distance
+
+# Example usage
+if __name__ == "__main__":
+    # Define cities with their coordinates (x, y)
+    cities = {
+        0: (0, 0),   # City 0
+        1: (1, 5),   # City 1
+        2: (5, 2),   # City 2
+        3: (6, 6),   # City 3
+        4: (7, 1)    # City 4
+    }
+    
+    route, distance = tsp_bruteforce(cities)
+    
+    print("Optimal route:", route)
+    print("Total distance:", distance)
