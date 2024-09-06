@@ -1,0 +1,63 @@
+from collections import deque
+
+# Define actions
+CLEAN_A = 'CLEAN_A'
+CLEAN_B = 'CLEAN_B'
+MOVE_TO_A = 'MOVE_TO_A'
+MOVE_TO_B = 'MOVE_TO_B'
+
+def get_neighbors(state):
+    dirt_A, dirt_B, vacuum_location = state
+    neighbors = []
+    
+    # Current location is A (vacuum_location = 0)
+    if vacuum_location == 0:
+        if dirt_A:
+            # Clean A
+            neighbors.append((False, dirt_B, 0, CLEAN_A))
+        # Move to B
+        neighbors.append((dirt_A, dirt_B, 1, MOVE_TO_B))
+    else:
+        if dirt_B:
+            # Clean B
+            neighbors.append((dirt_A, False, 1, CLEAN_B))
+        # Move to A
+        neighbors.append((dirt_A, dirt_B, 0, MOVE_TO_A))
+    
+    return neighbors
+
+def bfs(initial_state):
+    goal_state = (False, False, 0)
+    queue = deque([(initial_state, [])])
+    visited = set()
+    visited.add(initial_state)
+    
+    while queue:
+        (current_state, path) = queue.popleft()
+        
+        if current_state[0] == goal_state[0] and current_state[1] == goal_state[1]:
+            return path + [current_state]
+        
+        for neighbor in get_neighbors(current_state):
+            neighbor_state = (neighbor[0], neighbor[1], neighbor[2])
+            if neighbor_state not in visited:
+                visited.add(neighbor_state)
+                queue.append((neighbor_state, path + [current_state]))
+    
+    return None
+
+def print_solution(solution):
+    if solution:
+        print("Solution steps:")
+        for state in solution:
+            dirt_A, dirt_B, vacuum_location = state
+            print(f"Location A: {'Dirty' if dirt_A else 'Clean'}, Location B: {'Dirty' if dirt_B else 'Clean'}, Vacuum at {'A' if vacuum_location == 0 else 'B'}")
+    else:
+        print("No solution found.")
+
+if __name__ == "__main__":
+    # Example initial state: dirt in both locations, vacuum cleaner starts at A
+    initial_state = (True, True, 0)
+    
+    solution = bfs(initial_state)
+    print_solution(solution)
