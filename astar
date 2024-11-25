@@ -1,0 +1,97 @@
+from queue import PriorityQueue
+
+def a_star_search(graph, heuristics, start, goal):
+    open_list = PriorityQueue()
+    open_list.put((0, start))
+    came_from = {}  
+    g_cost = {start: 0}  
+
+    while not open_list.empty():
+        _, current = open_list.get()  
+
+        if current == goal:
+            path = []
+            while current in came_from:
+                path.append(current)
+                current = came_from[current]
+            path.append(start)
+            path.reverse()
+            return path, g_cost[goal]
+
+        for neighbor, cost in graph[current]:
+            tentative_g_cost = g_cost[current] + cost
+
+            if neighbor not in g_cost or tentative_g_cost < g_cost[neighbor]:
+                g_cost[neighbor] = tentative_g_cost
+                f_cost = tentative_g_cost + heuristics.get(neighbor, float('inf'))
+                open_list.put((f_cost, neighbor))
+                came_from[neighbor] = current
+
+    return None, float('inf')
+
+
+def get_graph():
+    graph = {}
+    print("Enter the graph as adjacency lists.")
+    print("For each node, enter its neighbors in the format: neighbor,cost (separated by spaces).")
+    print("Type 'done' when finished.")
+
+    while True:
+        node = input("\nEnter the node (or type 'done' to finish): ").strip()
+        if node.lower() == "done":
+            break
+
+        neighbors = input(f"Enter the neighbors of {node}: ").strip()
+        graph[node] = []
+
+        if neighbors:
+            for pair in neighbors.split():
+                neighbor, cost = pair.split(',')
+                graph[node].append((neighbor.strip(), int(cost)))
+
+    return graph
+
+
+def get_heuristics():
+    heuristics = {}
+    print("\nEnter the heuristic values for each node.")
+    print("Type 'done' when finished.")
+
+    while True:
+        data = input("Enter node and heuristic value as 'node,value': ").strip()
+        if data.lower() == "done":
+            break
+        node, value = data.split(',')
+        heuristics[node.strip()] = int(value.strip())
+
+    return heuristics
+
+
+if __name__ == "__main__":
+    print("Welcome to the A* Search Algorithm Implementation!")
+    graph = get_graph()
+    heuristics = get_heuristics()
+
+    print("\nGraph:", graph)
+    print("Heuristics:", heuristics)
+
+    while True:
+        start = input("\nEnter the start node: ").strip()
+        if start not in graph:
+            print(f"Invalid start node '{start}'. Please choose from {list(graph.keys())}.")
+            continue
+
+        goal = input("Enter the goal node: ").strip()
+        if goal not in graph:
+            print(f"Invalid goal node '{goal}'. Please choose from {list(graph.keys())}.")
+            continue
+
+        break
+
+    path, cost = a_star_search(graph, heuristics, start, goal)
+
+    if path:
+        print("\nPath found:", " -> ".join(path))
+        print("Total cost:", cost)
+    else:
+        print(f"No path found from {start} to {goal}.")

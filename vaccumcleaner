@@ -1,0 +1,60 @@
+class VacuumCleaner:
+    def __init__(self, grid):
+        self.grid = grid
+        self.grid_size = len(grid)
+        self.position = (0, 0)  # Starting position (top-left corner)
+
+    def display_grid(self):
+        grid_state = ""
+        for row in self.grid:
+            grid_state += " | ".join(row) + "\n"
+        return grid_state
+
+    def move(self, direction):
+        x, y = self.position
+        if direction == "up" and x > 0:
+            self.position = (x - 1, y)
+        elif direction == "down" and x < self.grid_size - 1:
+            self.position = (x + 1, y)
+        elif direction == "left" and y > 0:
+            self.position = (x, y - 1)
+        elif direction == "right" and y < self.grid_size - 1:
+            self.position = (x, y + 1)
+
+    def clean(self):
+        x, y = self.position
+        if self.grid[x][y] == "Dirty":
+            self.grid[x][y] = "Clean"
+            return f"Cleaned cell at position {self.position}."
+        else:
+            return f"Cell at position {self.position} is already clean."
+
+    def run(self):
+        log = "Initial grid:\n" + self.display_grid() + "\n"
+        while any("Dirty" in row for row in self.grid):
+            log += self.clean() + "\n"
+            # Simple movement strategy: Move right, then down
+            x, y = self.position
+            if y < self.grid_size - 1:
+                self.move("right")
+            elif x < self.grid_size - 1:
+                self.move("down")
+            else:
+                break
+            log += f"Moved to position {self.position}.\n"
+            log += self.display_grid() + "\n"
+        log += "Final grid (all clean):\n" + self.display_grid()
+        return log
+
+
+# Input from the user
+grid_size = int(input("Enter the grid size (e.g., 4 for a 4x4 grid): "))
+grid = []
+
+print(f"Enter the cleanliness status of each cell (Clean/Dirty) for the {grid_size}x{grid_size} grid:")
+for i in range(grid_size):
+    row = input(f"Enter row {i + 1} (space-separated, e.g., 'Dirty Clean Dirty Clean'): ").split()
+    grid.append(row)
+
+vacuum = VacuumCleaner(grid)
+print(vacuum.run())
